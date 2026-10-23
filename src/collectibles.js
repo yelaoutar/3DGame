@@ -1,0 +1,11 @@
+import * as THREE from 'three';
+import {surfaceGroup} from './planet.js';
+import {mesh,material} from './scene.js';
+export function heartGeometry(){const s=new THREE.Shape();s.moveTo(0,-.45);s.bezierCurveTo(-1,.1,-.55,.9,0,.45);s.bezierCurveTo(.55,.9,1,.1,0,-.45);const geo=new THREE.ExtrudeGeometry(s,{depth:.19,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.08,bevelThickness:.08,curveSegments:20});geo.center();return geo;}
+export class Collectibles {
+ constructor(scene,onCollect){this.scene=scene;this.onCollect=onCollect;this.hearts=[];this.particles=[];const normals=[[0,1,-.43],[.8,.5,-.55],[-.7,.15,-.8],[-.4,-.85,.3],[.65,.1,.8]];for(const n of normals){const g=surfaceGroup(scene,new THREE.Vector3(...n).normalize());const h=mesh(heartGeometry(),material('#ff9bc3',{emissive:'#fc659e',emissiveIntensity:1}),g,[0,1.1,0]);h.scale.setScalar(.55);const ring=mesh(new THREE.TorusGeometry(.65,.025,8,48),material('#ffcee4',{emissive:'#ff91c5',emissiveIntensity:1}),g,[0,.12,0]);ring.rotation.x=Math.PI/2;const light=new THREE.PointLight('#ff85bc',2,4);light.position.y=1;g.add(light);this.hearts.push({group:g,heart:h,collected:false});}}
+ burst(position,color='#ffb7d2',count=25,hearts=false){for(let i=0;i<count;i++){const m=mesh((hearts?heartGeometry():new THREE.IcosahedronGeometry(.06)),material(color,{emissive:color,emissiveIntensity:1}),this.scene);if(hearts)m.geometry.scale(.14,.14,.14);m.position.copy(position);this.particles.push({m,v:new THREE.Vector3().randomDirection().multiplyScalar(1+Math.random()*3),life:1.5});}}
+ update(dt,time,player,active){this.hearts.forEach((item,i)=>{if(item.collected)return;item.heart.rotation.y=time*1.3;item.heart.position.y=1.2+Math.sin(time*2+i)*.16;if(active&&item.heart.getWorldPosition(new THREE.Vector3()).distanceTo(player.clone().addScaledVector(player.clone().normalize(),.8))<1.3){item.collected=true;item.group.visible=false;this.burst(item.heart.getWorldPosition(new THREE.Vector3()));this.onCollect(i);}});this.particles=this.particles.filter(p=>{p.life-=dt;p.m.position.addScaledVector(p.v,dt);p.m.scale.setScalar(Math.max(0,p.life));if(p.life<=0){this.scene.remove(p.m);p.m.geometry.dispose();p.m.material.dispose();return false;}return true;});}
+ reset(){this.hearts.forEach(h=>{h.collected=false;h.group.visible=true;});}
+}
+
