@@ -12,7 +12,7 @@ function fakeCharacter(){
 function setup(){
  const scene=new THREE.Scene(),planet=new THREE.Group(),garden=new THREE.Group();scene.add(planet,garden);
  const player={body:new SphericalBody(),character:fakeCharacter(),reset(){this.body=new SphericalBody();}};scene.add(player.character.root);
- const dialogue={visible:false,anchorTo(object){this.anchor=object;},show(title,text,choices,speaker){Object.assign(this,{title,text,choices,speaker,visible:true});},hide(){this.visible=false;},toast(){}};
+ const dialogue={visible:false,addVoiceMessage(path){this.voiceMessage=path;},anchorTo(object){this.anchor=object;},show(title,text,choices,speaker){Object.assign(this,{title,text,choices,speaker,visible:true});},hide(){this.visible=false;},toast(){}};
  const collectibles={hearts:[],burst(){},reset(){}};
  const progression=new Progression(scene,planet,garden,player,dialogue,collectibles,fakeCharacter,()=>new THREE.Group());
  return {scene,player,dialogue,progression};
@@ -33,8 +33,8 @@ test('bouquet is handed to girl before proposal and both answers finish respectf
  for(const answer of [0,1]){
   const {scene,player,dialogue,progression:p}=setup();p.enterFlowerWorld();player.body.position.copy(p.boy.position);player.character.root.position.copy(player.body.position);scene.updateMatrixWorld(true);
   p.update(.01,0);assert.equal(dialogue.title,'These are for you.');dialogue.choices[0][1]();assert.equal(p.stage,'gift');assert.equal(p.controlsLocked,true);
-  p.update(1.5,2);assert.equal(p.flowers.parent,player.character.grip);assert.equal(player.character.holding,true);assert.equal(p.boyCharacter.holding,false);assert.equal(dialogue.title,"I know I have a lot of flaws...");assert.match(dialogue.text,/for you, I will change/);dialogue.choices[0][1]();assert.equal(dialogue.title,'Will you be my girlfriend?');
-  dialogue.choices[answer][1]();assert.equal(p.stage,answer===0?'celebration':'ending');assert.equal(p.celebrating,answer===0);
+  p.update(1.5,2);assert.equal(p.flowers.parent,player.character.grip);assert.equal(player.character.holding,true);assert.equal(p.boyCharacter.holding,false);assert.equal(dialogue.title,"I know I have a lot of flaws...");assert.match(dialogue.text,/for you, I will change/);dialogue.choices[0][1]();assert.equal(dialogue.title,'Will you be my girlfriend and my future wife?');
+  dialogue.choices[answer][1]();assert.equal(p.stage,answer===0?'celebration':'ending');assert.equal(p.celebrating,answer===0);assert.equal(dialogue.voiceMessage,answer===0?'Recording.m4a':undefined);
   dialogue.choices[0][1]();assert.equal(dialogue.visible,false);assert.equal(p.controlsLocked,false);
   p.reset();assert.equal(p.stage,'explore');assert.equal(p.flowers.visible,false);assert.equal(p.boy.parent,p.garden);
  }

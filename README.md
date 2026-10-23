@@ -55,3 +55,11 @@ The controller owns a local +Y up, +Z forward character root, with feet at local
 Tests cover 360-degree travel including underneath, jumping, camera stability, asset resources and animations, spherical guidance, the dialogue sequence, waiting for the girl to follow through the second portal, bouquet transfer, both proposal answers, and reset. Automated checks do not replace a visual browser playthrough.
 
 The bouquet uses the supplied `public/models/flower_bouquet.glb`, including its embedded textures and original materials. It is preloaded during play, scaled to a handheld size, and transferred from Youssef to the girl in the gift sequence. Its original license applies.
+
+
+## Youssef's voice message
+
+The proposal asks: "Will you be my girlfriend and my future wife?"
+After she chooses Yes, the celebration bubble shows an audio player for `public/Recording.m4a`. She can listen, pause and replay it. Closing the bubble stops playback. The recording is separate from M-key game sound effects.
+
+The path is configured in `src/voice-message-config.js`. Preserve the uppercase R in `Recording.m4a` when uploading to GitHub Pages. Set VOICE_MESSAGE to null to disable the player. Push the recording along with the source changes to publish it.

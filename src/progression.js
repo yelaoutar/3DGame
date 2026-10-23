@@ -1,3 +1,4 @@
+import {VOICE_MESSAGE} from './voice-message-config.js';
 import {createBouquet} from './bouquet.js';
 import * as THREE from 'three';
 import {surfaceGroup,createFlowerWorld} from './planet.js';
@@ -121,8 +122,8 @@ export class Progression {
   }
   propose() {
     this.stage='dialogue';
-    this.say('Youssef','Will you be my girlfriend?',"I'd love to share all the adventures ahead with you.",[
-      ['Yes!',()=>{this.celebrating=true;this.stage='celebration';this.say('Youssef','My favorite universe is ours.',"Here's to our next chapter, together.",[['Stay a little longer',()=>this.dialogue.hide()]]);}],
+    this.say('Youssef','Will you be my girlfriend and my future wife?',"I'd love to share all the adventures ahead with you.",[
+      ['Yes!',()=>{this.celebrating=true;this.stage='celebration';this.say('Youssef','My favorite universe is ours.',"Here's to our next chapter, together.",[['Stay a little longer',()=>this.dialogue.hide()]]);if(VOICE_MESSAGE)this.dialogue.addVoiceMessage(VOICE_MESSAGE);}],
       ["Let's talk about it",()=>{this.stage='ending';this.say('Youssef','Always, at your pace.',"No pressure, no expectations. You mean so much to me, and I'd love to hear how you feel.",[['Enjoy this little universe',()=>this.dialogue.hide()]]);}]
     ]);
   }

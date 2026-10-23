@@ -42,6 +42,7 @@ export class Dialogue {
     this.panel.style.setProperty('--tail-x', `${THREE.MathUtils.clamp(x - left + width / 2, 24, width - 24)}px`);
   }
   show(title, text, choices, speaker = 'Youssef') {
+    this.clearVoiceMessage();
     this.panel.querySelector('.eyebrow').textContent = speaker;
     document.querySelector('#dialogue-title').textContent = title;
     document.querySelector('#dialogue-text').textContent = text;
@@ -57,7 +58,27 @@ export class Dialogue {
     this.panel.classList.remove('hidden');
     root.querySelector('button')?.focus({preventScroll:true});
   }
+  clearVoiceMessage() {
+    if (this.voiceAudio) { this.voiceAudio.pause();this.voiceAudio.removeAttribute('src');this.voiceAudio.load();this.voiceAudio=null; }
+    this.panel.querySelector('.voice-message')?.remove();
+  }
+  addVoiceMessage(path) {
+    this.clearVoiceMessage();
+    const section=document.createElement('div');
+    section.className='voice-message';
+    const label=document.createElement('p');
+    label.textContent='A message from me, just for you.';
+    const audio=document.createElement('audio');
+    audio.controls=true;audio.preload='metadata';
+    audio.setAttribute('aria-label', "Listen to Youssef's message");
+    audio.src=`${import.meta.env?.BASE_URL ?? '/public/'}${path}`;
+    audio.addEventListener('error',()=>{label.textContent='The message could not load. Please try refreshing.';audio.hidden=true;});
+    section.append(label,audio);
+    document.querySelector('#choices').before(section);
+    this.voiceAudio=audio;
+  }
   hide() {
+    this.clearVoiceMessage();
     this.panel.classList.add('hidden');
     this.panel.classList.remove('speech-bubble');
     this.panel.style.cssText = '';
